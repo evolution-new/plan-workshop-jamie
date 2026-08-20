@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>План подготовки воркшопа · 6–8 ноября</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3F4F0;
+    --card:#FFFFFF;
+    --ink:#1A2420;
+    --muted:#77807B;
+    --line:#E2E4DD;
+    --accent:#2F5D4B;
+    --accent-soft:#ECF1EC;
+    --ochre:#96691E;
+    --ochre-soft:#F6EEDC;
+    --danger:#A33B2E;
+    --r:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',-apple-system,'Segoe UI',sans-serif;
+    font-size:15px;line-height:1.5;
+    padding:36px 18px 90px;
+  }
+  .wrap{max-width:860px;margin:0 auto}
+
+  header h1{
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-weight:600;font-size:clamp(30px,5vw,42px);
+    line-height:1.1;letter-spacing:.01em;
+  }
+  .sub{color:var(--muted);margin-top:6px;font-size:14px}
+  .statusline{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:18px;font-size:13px;color:var(--muted)}
+  .statusline b{color:var(--ink);font-weight:600}
+  #saveState{margin-left:auto;font-size:12.5px}
+  #saveState.warn{color:var(--ochre)}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 26px}
+  button{
+    font-family:inherit;font-size:13.5px;font-weight:500;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    border-radius:8px;padding:8px 14px;cursor:pointer;
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  button:hover{border-color:var(--accent)}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{background:#264c3d}
+  button.arm{background:var(--danger);border-color:var(--danger);color:#fff}
+
+  .block{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    margin-bottom:18px;overflow:hidden;
+  }
+  .block-head{padding:18px 20px 14px;position:relative}
+  .block-title{
+    font-family:'Cormorant Garamond',Georgia,serif;
+    font-weight:600;font-size:23px;line-height:1.15;
+    outline:none;border-radius:4px;padding:1px 4px;margin-left:-4px;
+    max-width:calc(100% - 90px);
+  }
+  .block-meta{display:flex;gap:14px;align-items:center;margin-top:6px;font-size:12.5px;color:var(--muted)}
+  .block-x{position:absolute;top:14px;right:14px;padding:5px 10px;font-size:12.5px;color:var(--muted)}
+  .progress{height:2px;background:var(--line)}
+  .progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s ease}
+  @media (prefers-reduced-motion: reduce){ .progress i{transition:none} *{transition:none!important} }
+
+  .tasks{padding:6px 12px 8px}
+  .task{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:10px 8px;border-top:1px solid var(--line);
+  }
+  .task:first-child{border-top:none}
+  .task input[type=checkbox]{
+    appearance:none;-webkit-appearance:none;flex:none;
+    width:18px;height:18px;margin-top:2px;cursor:pointer;
+    border:1.5px solid #B9BEB6;border-radius:5px;background:var(--card);
+    display:grid;place-content:center;
+  }
+  .task input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+  .task input[type=checkbox]:checked::before{
+    content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;
+    transform:rotate(-45deg) translate(0,-1px);
+  }
+  .task input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .t-main{flex:1;min-width:0}
+  .t-text{outline:none;border-radius:4px;padding:1px 3px;margin-left:-3px}
+  .task.done .t-text{color:var(--muted);text-decoration:line-through;text-decoration-color:#B9BEB6}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .chip{
+    font-size:12px;font-weight:500;border-radius:20px;padding:2.5px 10px;
+    outline:none;min-width:34px;
+  }
+  .chip.owner{background:var(--accent-soft);color:var(--accent)}
+  .chip.due{background:var(--ochre-soft);color:var(--ochre)}
+  .ed:focus{background:#F2F6F2;box-shadow:0 0 0 1px var(--accent) inset}
+  .ed:empty::before{content:attr(data-ph);color:#AEB4AC;font-weight:400}
+  .t-x{flex:none;border:none;background:none;color:#B9BEB6;font-size:16px;line-height:1;padding:4px 6px;margin-top:1px}
+  .t-x:hover{color:var(--danger);border:none}
+  .t-x.arm{color:#fff;background:var(--danger);border-radius:6px}
+
+  .block-foot{padding:4px 14px 14px}
+  .add-task{border:none;background:none;color:var(--accent);font-weight:500;padding:6px 8px}
+  .add-task:hover{border:none;text-decoration:underline}
+
+  .hint{color:var(--muted);font-size:12.5px;margin-top:26px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>План подготовки воркшопа с&nbsp;Джейми</h1>
+    <div class="sub">6–8 ноября · Москва · группа 16–20 · старт в 10:00</div>
+    <div class="statusline">
+      <span>Выполнено: <b id="doneCount">0</b> из <b id="totalCount">0</b></span>
+      <span id="saveState"></span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="primary" id="addBlock">+ Блок</button>
+    <button id="copyMd">Скопировать как текст</button>
+    <button id="reset">Сбросить к исходному</button>
+  </div>
+
+  <main id="blocks" aria-live="polite"></main>
+
+  <p class="hint">Все поля редактируются по клику: название блока, текст задачи, ответственный, срок. Изменения сохраняются автоматически. «Скопировать как текст» — чтобы перенести план в миро или отправить в чат.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "workshop-plan-jamie-v1";
+  var uidN = 0;
+  function uid(){ return "id" + (++uidN) + "_" + Date.now().toString(36); }
+  function T(text, owner, due, done){ return {id:uid(), text:text, owner:owner||"", due:due||"", done:!!done}; }
+  function B(title, tasks){ return {id:uid(), title:title, tasks:tasks}; }
+
+  function seed(){ return { blocks: [
+    B("JTBD — зачем людям этот воркшоп", [
+      T("Провести 3–5 интервью с прошлыми участниками, зафиксировать их формулировки", "Женя", "до 31.08"),
+      T("Выбрать 1–2 ведущие «работы» — из них следуют оффер, цена и тексты", "Женя", "до 31.08"),
+      T("Принять продуктовое решение: индивидуальная работа с Джейми — гарантия (16 чел) или нет (до 20)", "", "до 31.08")
+    ]),
+    B("Экономика и цена", [
+      T("Собрать бюджет: гонорар Джейми, перелёт и отель, площадка, кейтеринг, перевод, материалы, эквайринг, резерв 10%", "", "до 05.09"),
+      T("Посчитать три сценария: 16 / 18 / 20 участников — цена и маржа", "", "до 05.09"),
+      T("Определить точку безубыточности и минимальный набор для Go", "", "до 05.09"),
+      T("Прописать политику возвратов и переносов — до первой продажи", "", "до 05.09")
+    ]),
+    B("Джейми: договор и логистика — критический путь", [
+      T("Договор: гонорар, права на фото и видео, условия отмены", "", "до 05.09"),
+      T("Виза в РФ: приглашение и подача — запустить немедленно, зафиксировать дату плана Б", "", "сейчас"),
+      T("Перелёт (прилёт не позже 04.11), отель рядом с площадкой, трансферы, райдер", "", "до 26.09"),
+      T("Решить вопрос перевода: переводчик / без перевода / шушутаж — влияет на тайминг и бюджет", "", "до 12.09")
+    ]),
+    B("Программа", [
+      T("Архитектура трёх дней с Джейми: интенсив до обеда, интеграция после", "", "до 15.09"),
+      T("Формат и квота индивидуальной работы: сколько слотов в день реально", "", "до 15.09"),
+      T("Pre-work участникам: что прислать заранее", "", "до 17.10"),
+      T("Материалы, плейлисты, реквизит", "", "до 24.10")
+    ]),
+    B("Продажи и коммуникация", [
+      T("Оффер и лендинг/лонгрид на языке JTBD — про результат, не про «телесные практики»", "", "до 10.09"),
+      T("Канальный план: личные приглашения тёплой базе → Telegram → партнёры", "", "до 10.09"),
+      T("Механика: предоплата, договор-оферта, лист ожидания сверх 20", "", "до 12.09"),
+      T("Календарь касаний: анонс → истории → «осталось N мест» → закрытие", "", "до 12.09")
+    ]),
+    B("Площадка и операционка", [
+      T("Найти и забронировать зал: площадь на 20+, покрытие/маты, вентиляция, звук, свет, можно шуметь", "", "до 12.09"),
+      T("Кейтеринг: лёгкий обед и кофе-паузы", "", "до 10.10"),
+      T("Раздевалки, вода, полотенца, аптечка", "", "до 24.10"),
+      T("Прогон-визит на площадку", "", "03.11")
+    ]),
+    B("Опыт участников", [
+      T("Анкета при регистрации: медицинские противопоказания + disclaimer о физической нагрузке", "", "до 12.09"),
+      T("Welcome-письмо: что взять, форма одежды, как готовиться", "", "до 17.10"),
+      T("Чат группы за неделю до старта", "", "30.10"),
+      T("Согласия на фото и видео", "", "до 24.10"),
+      T("Follow-up: материалы, обратная связь, мостик к следующим продуктам", "", "до 15.11")
+    ]),
+    B("Команда и роли", [
+      T("RACI на страницу: продажи, логистика, Джейми, площадка, деньги", "", "до 05.09"),
+      T("Кто хостит зал во время процесса, пока Женя внутри", "", "до 24.10"),
+      T("Брифинг команды", "", "03.11")
+    ]),
+    B("Контрольные точки", [
+      T("JTBD зафиксирован, решение 16 vs 20 принято", "", "31.08"),
+      T("Бюджет и цена утверждены, договор подписан, виза запущена", "", "05.09"),
+      T("Площадка забронирована, продажи открыты", "", "12.09"),
+      T("Go/No-Go: набор ≥ безубыточности, статус визы", "", "03.10"),
+      T("Логистика закрыта, pre-work отправлен", "", "24.10"),
+      T("Воркшоп", "", "06–08.11")
+    ]),
+    B("Риски", [
+      T("Виза не успевает → запуск сейчас + дата плана Б", ""),
+      T("Недобор группы → Go/No-Go 03.10, тёплая база до публичного анонса", ""),
+      T("Травма участника → анкета, disclaimer, аптечка, страховка ивента", ""),
+      T("Срыв у Джейми (болезнь, рейс) → страховка отмены, буферный день прилёта", "")
+    ])
+  ]}; }
+
+  var state = null;
+  var storageOk = (typeof window.storage !== "undefined" && window.storage && typeof window.storage.get === "function");
+  var saveTimer = null;
+  var el = {
+    blocks: document.getElementById("blocks"),
+    done: document.getElementById("doneCount"),
+    total: document.getElementById("totalCount"),
+    save: document.getElementById("saveState")
+  };
+
+  function setSave(msg, warn){ el.save.textContent = msg; el.save.className = warn ? "warn" : ""; }
+
+  async function load(){
+    if(storageOk){
+      try{
+        var r = await window.storage.get(KEY);
+        if(r && r.value){ state = JSON.parse(r.value); setSave("Сохранено"); return; }
+      }catch(e){ /* нет сохранённой версии — используем исходный план */ }
+    }
+    state = seed();
+    if(!storageOk) setSave("Изменения живут только в этой сессии", true);
+    persist();
+  }
+
+  function persist(){
+    if(!storageOk) return;
+    setSave("Сохраняю…");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async function(){
+      try{
+        var r = await window.storage.set(KEY, JSON.stringify(state));
+        setSave(r ? "Сохранено" : "Не удалось сохранить", !r);
+      }catch(e){ setSave("Не удалось сохранить", true); }
+    }, 500);
+  }
+
+  function findBlock(bid){ for(var i=0;i<state.blocks.length;i++) if(state.blocks[i].id===bid) return state.blocks[i]; return null; }
+  function findTask(b,tid){ for(var i=0;i<b.tasks.length;i++) if(b.tasks[i].id===tid) return b.tasks[i]; return null; }
+
+  function counts(){
+    var d=0,t=0;
+    state.blocks.forEach(function(b){ b.tasks.forEach(function(x){ t++; if(x.done) d++; }); });
+    el.done.textContent=d; el.total.textContent=t;
+  }
+
+  function editable(cls, ph, val, bid, tid, field){
+    var s=document.createElement("span");
+    s.className=cls+" ed"; s.contentEditable="true"; s.spellcheck=false;
+    s.dataset.ph=ph; s.dataset.b=bid; if(tid) s.dataset.t=tid; s.dataset.f=field;
+    s.textContent=val;
+    return s;
+  }
+
+  function render(){
+    el.blocks.textContent="";
+    state.blocks.forEach(function(b){
+      var card=document.createElement("section"); card.className="block"; card.dataset.b=b.id;
+
+      var head=document.createElement("div"); head.className="block-head";
+      var title=editable("block-title","Название блока",b.title,b.id,null,"title");
+      title.setAttribute("role","heading"); title.setAttribute("aria-level","2");
+      var meta=document.createElement("div"); meta.className="block-meta";
+      var cnt=document.createElement("span"); cnt.className="cnt";
+      meta.appendChild(cnt);
+      var bx=document.createElement("button"); bx.className="block-x"; bx.dataset.act="delBlock"; bx.textContent="убрать";
+      head.appendChild(title); head.appendChild(meta); head.appendChild(bx);
+
+      var prog=document.createElement("div"); prog.className="progress";
+      var bar=document.createElement("i"); prog.appendChild(bar);
+
+      var list=document.createElement("div"); list.className="tasks";
+      b.tasks.forEach(function(t){ list.appendChild(renderTask(b,t)); });
+
+      var foot=document.createElement("div"); foot.className="block-foot";
+      var add=document.createElement("button"); add.className="add-task"; add.dataset.act="addTask"; add.textContent="+ задача";
+      foot.appendChild(add);
+
+      card.appendChild(head); card.appendChild(prog); card.appendChild(list); card.appendChild(foot);
+      el.blocks.appendChild(card);
+      refreshBlock(card,b);
+    });
+    counts();
+  }
+
+  function renderTask(b,t){
+    var row=document.createElement("div"); row.className="task"+(t.done?" done":""); row.dataset.t=t.id;
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=t.done; cb.dataset.act="toggle";
+    cb.setAttribute("aria-label","Задача выполнена");
+    var main=document.createElement("div"); main.className="t-main";
+    var txt=editable("t-text","Новая задача",t.text,b.id,t.id,"text");
+    var chips=document.createElement("div"); chips.className="chips";
+    chips.appendChild(editable("chip owner","ответственный",t.owner,b.id,t.id,"owner"));
+    chips.appendChild(editable("chip due","срок",t.due,b.id,t.id,"due"));
+    main.appendChild(txt); main.appendChild(chips);
+    var x=document.createElement("button"); x.className="t-x"; x.dataset.act="delTask"; x.textContent="×";
+    x.setAttribute("aria-label","Удалить задачу");
+    row.appendChild(cb); row.appendChild(main); row.appendChild(x);
+    return row;
+  }
+
+  function refreshBlock(card,b){
+    var d=b.tasks.filter(function(t){return t.done;}).length;
+    card.querySelector(".cnt").textContent = b.tasks.length ? (d+" из "+b.tasks.length) : "пока пусто";
+    card.querySelector(".progress i").style.width = b.tasks.length ? (100*d/b.tasks.length)+"%" : "0";
+  }
+
+  /* --- двухтаповое подтверждение удаления --- */
+  var armed=null, armTimer=null;
+  function arm(btn,label){
+    disarm();
+    armed=btn; btn.classList.add("arm");
+    btn.dataset.old=btn.textContent; btn.textContent=label;
+    armTimer=setTimeout(disarm,2600);
+  }
+  function disarm(){
+    if(armed){ armed.classList.remove("arm"); armed.textContent=armed.dataset.old||armed.textContent; }
+    armed=null; clearTimeout(armTimer);
+  }
+
+  document.addEventListener("click", function(e){
+    var btn=e.target.closest("button");
+    if(!btn){ if(armed) disarm(); return; }
+    var act=btn.dataset.act;
+    if(!act){ return; }
+    var card=btn.closest(".block");
+    var b=card?findBlock(card.dataset.b):null;
+
+    if(act==="addTask" && b){
+      var t=T("","","");
+      b.tasks.push(t);
+      var list=card.querySelector(".tasks");
+      var row=renderTask(b,t);
+      list.appendChild(row);
+      refreshBlock(card,b); counts(); persist();
+      row.querySelector(".t-text").focus();
+      return;
+    }
+    if(act==="toggle") return; // обрабатывается в change
+    if(act==="delTask" && b){
+      if(armed!==btn){ arm(btn,"×"); btn.textContent="×"; btn.classList.add("arm"); return; }
+      disarm();
+      var row=btn.closest(".task");
+      b.tasks=b.tasks.filter(function(t){return t.id!==row.dataset.t;});
+      row.remove(); refreshBlock(card,b); counts(); persist();
+      return;
+    }
+    if(act==="delBlock" && b){
+      if(armed!==btn){ arm(btn,"точно убрать?"); return; }
+      disarm();
+      state.blocks=state.blocks.filter(function(x){return x.id!==b.id;});
+      card.remove(); counts(); persist();
+      return;
+    }
+  });
+
+  document.getElementById("addBlock").addEventListener("click", function(){
+    var b=B("",[T("","","")]);
+    state.blocks.push(b); persist();
+    render();
+    var card=el.blocks.querySelector('[data-b="'+b.id+'"]');
+    if(card){ card.scrollIntoView({behavior:"smooth",block:"center"}); card.querySelector(".block-title").focus(); }
+  });
+
+  document.getElementById("reset").addEventListener("click", function(){
+    var btn=this;
+    if(armed!==btn){ arm(btn,"вернуть исходный план?"); return; }
+    disarm();
+    state=seed(); persist(); render();
+  });
+
+  document.getElementById("copyMd").addEventListener("click", function(){
+    var btn=this;
+    var lines=["# План подготовки воркшопа с Джейми · 6–8 ноября",""];
+    state.blocks.forEach(function(b){
+      lines.push("## "+(b.title||"Без названия"));
+      b.tasks.forEach(function(t){
+        var s="- ["+(t.done?"x":" ")+"] "+(t.text||"—");
+        if(t.owner) s+=" · @"+t.owner;
+        if(t.due) s+=" · "+t.due;
+        lines.push(s);
+      });
+      lines.push("");
+    });
+    var md=lines.join("\n");
+    function ok(){ var o=btn.textContent; btn.textContent="Скопировано"; setTimeout(function(){btn.textContent=o;},1600); }
+    function fallback(){
+      var ta=document.createElement("textarea");
+      ta.value=md; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); ok(); }catch(e){}
+      ta.remove();
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(md).then(ok, fallback);
+    } else { fallback(); }
+  });
+
+  el.blocks.addEventListener("change", function(e){
+    var cb=e.target;
+    if(cb.dataset.act!=="toggle") return;
+    var card=cb.closest(".block"), row=cb.closest(".task");
+    var b=findBlock(card.dataset.b), t=findTask(b,row.dataset.t);
+    t.done=cb.checked;
+    row.classList.toggle("done",t.done);
+    refreshBlock(card,b); counts(); persist();
+  });
+
+  el.blocks.addEventListener("input", function(e){
+    var f=e.target;
+    if(!f.classList.contains("ed")) return;
+    var b=findBlock(f.dataset.b); if(!b) return;
+    var val=f.textContent.replace(/\n/g," ").trim();
+    if(f.dataset.f==="title"){ b.title=val; }
+    else{
+      var t=findTask(b,f.dataset.t); if(!t) return;
+      t[f.dataset.f]=val;
+    }
+    persist();
+  });
+
+  el.blocks.addEventListener("keydown", function(e){
+    if(e.key==="Enter" && e.target.classList.contains("ed")){ e.preventDefault(); e.target.blur(); }
+  });
+
+  load().then(render);
+})();
+</script>
+</body>
+</html>
