@@ -210,6 +210,27 @@
   ]}; }
 
   var state = null;
+  var sharedApi = null;
+  if(window.fetch && window.location.protocol === "http:"){
+    sharedApi = {
+      kind: "shared",
+      endpoint: "/jamie-plan-api/state",
+      get: async function(){
+        var res = await fetch(this.endpoint, { cache: "no-store" });
+        if(!res.ok) throw new Error("shared load failed");
+        return res.json();
+      },
+      set: async function(payload){
+        var res = await fetch(this.endpoint, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error("shared save failed");
+        return res.json();
+      }
+    };
+  }
   var storageApi = null;
   if(typeof window.storage !== "undefined" && window.storage && typeof window.storage.get === "function"){
     storageApi = {
@@ -235,6 +256,9 @@
     }catch(e){ /* localStorage недоступен — оставим только память текущей вкладки */ }
   }
   var storageOk = !!storageApi;
+  var sharedVersion = 0;
+  var sharedPollTimer = null;
+  var pendingRemote = null;
   var saveTimer = null;
   var el = {
     blocks: document.getElementById("blocks"),
@@ -245,7 +269,54 @@
 
   function setSave(msg, warn){ el.save.textContent = msg; el.save.className = warn ? "warn" : ""; }
 
+  function isEditableActive(){
+    return !!(document.activeElement && document.activeElement.classList && document.activeElement.classList.contains("ed"));
+  }
+
+  function applySharedState(payload, msg){
+    if(!payload || !payload.state || !payload.state.blocks) return false;
+    state = payload.state;
+    sharedVersion = payload.version || sharedVersion;
+    render();
+    setSave(msg || "Подтянула изменения из общего плана");
+    return true;
+  }
+
+  function startSharedPolling(){
+    if(!sharedApi || sharedPollTimer) return;
+    sharedPollTimer = setInterval(async function(){
+      if(!state) return;
+      try{
+        var remote = await sharedApi.get();
+        if(!remote || !remote.state || !remote.version || remote.version <= sharedVersion) return;
+        if(isEditableActive() || saveTimer){
+          pendingRemote = remote;
+          setSave("Есть новые изменения, подтяну после паузы", true);
+          return;
+        }
+        pendingRemote = null;
+        applySharedState(remote);
+      }catch(e){
+        setSave("Нет связи с общим планом", true);
+      }
+    }, 4000);
+  }
+
   async function load(){
+    if(sharedApi){
+      try{
+        var shared = await sharedApi.get();
+        if(applySharedState(shared, "Общее сохранение включено")){
+          startSharedPolling();
+          return;
+        }
+      }catch(e){ /* общий storage недоступен — пойдём в локальный fallback */ }
+      state = seed();
+      setSave("Общее сохранение включено");
+      persist();
+      startSharedPolling();
+      return;
+    }
     if(storageOk){
       try{
         var r = await storageApi.get(KEY);
@@ -263,17 +334,24 @@
   }
 
   function persist(){
-    if(!storageOk) return;
-    setSave("Сохраняю…");
+    if(!sharedApi && !storageOk) return;
+    setSave(sharedApi ? "Сохраняю для всех…" : "Сохраняю…");
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async function(){
+      saveTimer = null;
       try{
+        if(sharedApi){
+          var shared = await sharedApi.set({ key: KEY, state: state, version: sharedVersion });
+          sharedVersion = shared && shared.version ? shared.version : sharedVersion;
+          setSave("Сохранено для всех");
+          return;
+        }
         var r = await storageApi.set(KEY, JSON.stringify(state));
         setSave(
           r ? (storageApi.kind === "local" ? "Сохранено в этом браузере" : "Сохранено") : "Не удалось сохранить",
           !r
         );
-      }catch(e){ setSave("Не удалось сохранить", true); }
+      }catch(e){ setSave(sharedApi ? "Не удалось сохранить для всех" : "Не удалось сохранить", true); }
     }, 500);
   }
 
@@ -463,6 +541,14 @@
 
   el.blocks.addEventListener("keydown", function(e){
     if(e.key==="Enter" && e.target.classList.contains("ed")){ e.preventDefault(); e.target.blur(); }
+  });
+
+  document.addEventListener("focusout", function(){
+    if(pendingRemote && !isEditableActive() && !saveTimer){
+      var remote = pendingRemote;
+      pendingRemote = null;
+      applySharedState(remote);
+    }
   });
 
   load().then(render);

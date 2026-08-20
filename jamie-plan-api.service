@@ -1,0 +1,16 @@
+[Unit]
+Description=Jamie Plan Shared API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/jamie-plan-api
+ExecStart=/usr/bin/python3 /opt/jamie-plan-api/server.py
+Restart=always
+RestartSec=2
+Environment=JAMIE_PLAN_DATA=/opt/jamie-plan-api/data/state.json
+Environment=JAMIE_PLAN_HOST=127.0.0.1
+Environment=JAMIE_PLAN_PORT=8771
+
+[Install]
+WantedBy=multi-user.target
