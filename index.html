@@ -210,7 +210,31 @@
   ]}; }
 
   var state = null;
-  var storageOk = (typeof window.storage !== "undefined" && window.storage && typeof window.storage.get === "function");
+  var storageApi = null;
+  if(typeof window.storage !== "undefined" && window.storage && typeof window.storage.get === "function"){
+    storageApi = {
+      kind: "host",
+      get: function(key){ return window.storage.get(key); },
+      set: function(key, value){ return window.storage.set(key, value); }
+    };
+  }else{
+    try{
+      if(typeof window.localStorage !== "undefined"){
+        var probeKey = KEY + "__probe";
+        window.localStorage.setItem(probeKey, "1");
+        window.localStorage.removeItem(probeKey);
+        storageApi = {
+          kind: "local",
+          get: function(key){ return Promise.resolve({ value: window.localStorage.getItem(key) }); },
+          set: function(key, value){
+            window.localStorage.setItem(key, value);
+            return Promise.resolve(true);
+          }
+        };
+      }
+    }catch(e){ /* localStorage недоступен — оставим только память текущей вкладки */ }
+  }
+  var storageOk = !!storageApi;
   var saveTimer = null;
   var el = {
     blocks: document.getElementById("blocks"),
@@ -224,12 +248,17 @@
   async function load(){
     if(storageOk){
       try{
-        var r = await window.storage.get(KEY);
-        if(r && r.value){ state = JSON.parse(r.value); setSave("Сохранено"); return; }
+        var r = await storageApi.get(KEY);
+        if(r && r.value){
+          state = JSON.parse(r.value);
+          setSave(storageApi.kind === "local" ? "Сохранено в этом браузере" : "Сохранено");
+          return;
+        }
       }catch(e){ /* нет сохранённой версии — используем исходный план */ }
     }
     state = seed();
-    if(!storageOk) setSave("Изменения живут только в этой сессии", true);
+    if(!storageOk) setSave("Не удалось включить сохранение в браузере", true);
+    else if(storageApi.kind === "local") setSave("Изменения сохраняются в этом браузере");
     persist();
   }
 
@@ -239,8 +268,11 @@
     clearTimeout(saveTimer);
     saveTimer = setTimeout(async function(){
       try{
-        var r = await window.storage.set(KEY, JSON.stringify(state));
-        setSave(r ? "Сохранено" : "Не удалось сохранить", !r);
+        var r = await storageApi.set(KEY, JSON.stringify(state));
+        setSave(
+          r ? (storageApi.kind === "local" ? "Сохранено в этом браузере" : "Сохранено") : "Не удалось сохранить",
+          !r
+        );
       }catch(e){ setSave("Не удалось сохранить", true); }
     }, 500);
   }
